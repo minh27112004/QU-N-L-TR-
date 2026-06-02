@@ -248,7 +248,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         ws = wb.active
         
         # Clean title for Excel sheet (remove invalid characters and restrict to 31 chars)
-        sheet_title = f"Phong {room.room_code}"
+        sheet_title = f"Phòng {room.room_name}"
         for c in ['\\', '/', '?', '*', ':', '[', ']']:
             sheet_title = sheet_title.replace(c, '-')
         ws.title = sheet_title[:31]
@@ -497,8 +497,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         for payment in payments_qs:
             room = payment.room
 
-            # Sheet name: max 31 chars (Excel limit) and no invalid characters
-            sheet_name = f"{room.room_code} - {payment.month}"
+            sheet_name = f"{room.room_name} - {payment.month}"
             for c in ['\\', '/', '?', '*', ':', '[', ']']:
                 sheet_name = sheet_name.replace(c, '-')
             if len(sheet_name) > 31:
