@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { paymentService, roomService, houseService } from '../services/api';
 import type { Payment, Room, House } from '../services/api';
-import { Plus, Filter, Check, Calendar, DollarSign, Lightbulb, Droplet, X, AlertCircle, FileSpreadsheet, Building, Pencil, Download } from 'lucide-react';
+import { Plus, Filter, Check, Calendar, DollarSign, Lightbulb, Droplet, X, AlertCircle, FileSpreadsheet, Building, Pencil, Download, Trash2 } from 'lucide-react';
 
 const getCurrentMonth = (): string => {
   const date = new Date();
@@ -53,6 +53,7 @@ const Payments: React.FC = () => {
     surcharge_desc: '',
   });
   const [formError, setFormError] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
   // Dynamic calculations inside modal
   const [selectedRoomPrice, setSelectedRoomPrice] = useState<number>(0);
@@ -382,6 +383,18 @@ const Payments: React.FC = () => {
     }
   };
 
+  const handleDeletePayment = async (id: number) => {
+    try {
+      await paymentService.delete(id);
+      setDeleteConfirmId(null);
+      fetchPayments();
+    } catch (err) {
+      console.error('Failed to delete payment:', err);
+      alert('Không thể xóa phiếu thu này.');
+      setDeleteConfirmId(null);
+    }
+  };
+
   const handleExportExcel = async (paymentId: number, roomCode: string, month: string) => {
     try {
       const response = await paymentService.exportExcel(paymentId);
@@ -598,6 +611,14 @@ const Payments: React.FC = () => {
                               >
                                 <Pencil className="w-3.5 h-3.5" />
                                 Sửa
+                              </button>
+                              <button
+                                onClick={() => payment.id && setDeleteConfirmId(payment.id)}
+                                className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600 active:bg-rose-700 text-rose-400 hover:text-white border border-rose-500/30 rounded-lg text-xs font-bold transition duration-200 cursor-pointer flex items-center gap-1"
+                                title="Xóa phiếu thu"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                Xóa
                               </button>
                             </>
                           ) : (
@@ -952,6 +973,36 @@ const Payments: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)}></div>
+          <div className="relative bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-sm w-full text-center space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="w-16 h-16 bg-rose-600/10 text-rose-500 rounded-full flex items-center justify-center mx-auto border border-rose-500/20">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-lg font-extrabold text-white">Xóa phiếu thu này?</h3>
+              <p className="text-xs text-slate-400 mt-2">Bạn có chắc chắn muốn xóa phiếu thu này không? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition duration-150 text-sm cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={() => handleDeletePayment(deleteConfirmId)}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-bold rounded-xl transition duration-150 text-sm cursor-pointer shadow-lg shadow-rose-600/20"
+              >
+                Xóa phiếu thu
+              </button>
+            </div>
           </div>
         </div>
       )}
