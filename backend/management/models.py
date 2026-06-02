@@ -78,9 +78,9 @@ class Contract(models.Model):
     occupants_count = models.IntegerField(default=1, verbose_name="Số người ở")
 
     def clean(self):
-        # Validate that start_date is before end_date
-        if self.start_date and self.end_date and self.start_date >= self.end_date:
-            raise ValidationError("Ngày bắt đầu phải trước ngày kết thúc.")
+        # Validate that start_date is before or equal to end_date
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            raise ValidationError("Ngày bắt đầu không được sau ngày kết thúc.")
             
         # Check if room is already rented by another active contract (excluding self)
         if self.is_active:

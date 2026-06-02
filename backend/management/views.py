@@ -157,7 +157,14 @@ class ContractViewSet(viewsets.ModelViewSet):
         if contract.end_date > today:
             contract.end_date = today
         
-        contract.save()
+        from django.core.exceptions import ValidationError
+        try:
+            contract.save()
+        except ValidationError as e:
+            return Response(
+                {"detail": e.messages[0] if hasattr(e, 'messages') else str(e)}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(
             {
                 "status": "Hợp đồng đã được kết thúc thành công.",
