@@ -22,5 +22,5 @@ COPY . /app/
 # Expose port
 EXPOSE 8000
 
-# Start command (migrations and collection will run from docker-compose or start script)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Start command runs migrations, collects static files, and starts Gunicorn
+CMD bash -c "python manage.py collectstatic --noinput && python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
