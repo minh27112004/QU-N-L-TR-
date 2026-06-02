@@ -345,14 +345,14 @@ class PaymentViewSet(viewsets.ModelViewSet):
         # Row 7 (STT 4): Internet (Phòng/tháng)
         row_4 = [
             4, "Internet (Phòng/tháng)", "", "", "", "", "", "", 
-            float(payment.internet_price), 
+            "", 
             float(payment.internet_price)
         ]
         
         # Row 8 (STT 5): Tiền phòng
         row_5 = [
             5, "Tiền phòng", 
-            room.room_code,  # Yellow room code in Chỉ số mới column
+            room.room_name,  # Yellow room name in Chỉ số mới column
             "", "", "", "", "", "", 
             float(payment.room_fee)
         ]
@@ -386,7 +386,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                         try:
                             # Try to make float/int for display formatting
                             cell.value = float(val) if '.' in str(val) else int(val)
-                            cell.number_format = '#,##0'
+                            cell.number_format = '#,##0;-#,##0;"-"'
                         except ValueError:
                             pass
                 else:  # Unit Price, Amount columns
@@ -394,7 +394,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                     cell.font = font_bold
                     if val != "":
                         cell.value = float(val)
-                        cell.number_format = '#,##0'
+                        cell.number_format = '#,##0;-#,##0;"-"'
                 
                 # Yellow background for Room Code on Tiền phòng row
                 if current_row_idx == 8 and col_idx == 3:
@@ -419,22 +419,31 @@ class PaymentViewSet(viewsets.ModelViewSet):
         total_val_cell.font = Font(name='Times New Roman', size=11, bold=True)
         total_val_cell.alignment = Alignment(horizontal='right', vertical='center')
         total_val_cell.border = thin_border
-        total_val_cell.number_format = '#,##0'
+        total_val_cell.number_format = '#,##0;-#,##0;"-"'
         
         # Add bank transfer details at the bottom
         bank_row_idx = total_row_idx + 2
         ws.merge_cells(start_row=bank_row_idx, start_column=1, end_row=bank_row_idx, end_column=10)
         bank_cell = ws.cell(row=bank_row_idx, column=1)
-        bank_cell.value = f"số tài khoản : {house.bank_account} Ngân hàng {house.bank_name} Chủ tài khoản: {house.bank_owner}"
-        bank_cell.font = Font(name='Times New Roman', size=11, bold=True)
+        
+        from openpyxl.cell.rich_text import CellRichText, TextBlock
+        from openpyxl.cell.text import InlineFont
+        red_font = InlineFont(rFont='Times New Roman', sz=11, b=True, color='FF0000')
+        regular_font = InlineFont(rFont='Times New Roman', sz=11, b=True)
+        
+        rich_text = CellRichText(
+            TextBlock(regular_font, f"Các bạn chuyển khoản đến tài khoản {house.bank_name.upper()} : "),
+            TextBlock(red_font, f"{house.bank_account}"),
+            TextBlock(regular_font, f" {house.bank_owner}")
+        )
+        bank_cell.value = rich_text
         bank_cell.alignment = Alignment(horizontal='left', vertical='center')
         ws.row_dimensions[bank_row_idx].height = 20
 
         note_row_idx = total_row_idx + 3
         ws.merge_cells(start_row=note_row_idx, start_column=1, end_row=note_row_idx, end_column=10)
         note_cell = ws.cell(row=note_row_idx, column=1)
-        transfer_code = f"{house.bank_transfer_prefix} {room.room_code}"
-        note_cell.value = f"Lưu ý : CHỈ CẦN GHI NỘI DUNG {transfer_code}"
+        note_cell.value = "Lưu Ý : ko cần ghi nội dung"
         note_cell.font = Font(name='Times New Roman', size=11, bold=True)
         note_cell.alignment = Alignment(horizontal='left', vertical='center')
         ws.row_dimensions[note_row_idx].height = 20
@@ -579,13 +588,13 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
             row_4 = [
                 4, "Internet (Phòng/tháng)", "", "", "", "", "", "",
-                float(payment.internet_price),
+                "",
                 float(payment.internet_price)
             ]
 
             row_5 = [
                 5, "Tiền phòng",
-                room.room_code,
+                room.room_name,
                 "", "", "", "", "", "",
                 float(payment.room_fee)
             ]
@@ -617,7 +626,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                         if val != "":
                             try:
                                 cell.value = float(val) if '.' in str(val) else int(val)
-                                cell.number_format = '#,##0'
+                                cell.number_format = '#,##0;-#,##0;"-"'
                             except ValueError:
                                 pass
                     else:
@@ -625,7 +634,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
                         cell.font = font_bold
                         if val != "":
                             cell.value = float(val)
-                            cell.number_format = '#,##0'
+                            cell.number_format = '#,##0;-#,##0;"-"'
 
                     if current_row_idx == 8 and col_idx == 3:
                         cell.fill = yellow_fill
@@ -645,22 +654,31 @@ class PaymentViewSet(viewsets.ModelViewSet):
             total_val_cell.font = Font(name='Times New Roman', size=11, bold=True)
             total_val_cell.alignment = Alignment(horizontal='right', vertical='center')
             total_val_cell.border = thin_border
-            total_val_cell.number_format = '#,##0'
+            total_val_cell.number_format = '#,##0;-#,##0;"-"'
 
             # Add bank transfer details at the bottom
             bank_row_idx = total_row_idx + 2
             ws.merge_cells(start_row=bank_row_idx, start_column=1, end_row=bank_row_idx, end_column=10)
             bank_cell = ws.cell(row=bank_row_idx, column=1)
-            bank_cell.value = f"số tài khoản : {house.bank_account} Ngân hàng {house.bank_name} Chủ tài khoản: {house.bank_owner}"
-            bank_cell.font = Font(name='Times New Roman', size=11, bold=True)
+            
+            from openpyxl.cell.rich_text import CellRichText, TextBlock
+            from openpyxl.cell.text import InlineFont
+            red_font = InlineFont(rFont='Times New Roman', sz=11, b=True, color='FF0000')
+            regular_font = InlineFont(rFont='Times New Roman', sz=11, b=True)
+            
+            rich_text = CellRichText(
+                TextBlock(regular_font, f"Các bạn chuyển khoản đến tài khoản {house.bank_name.upper()} : "),
+                TextBlock(red_font, f"{house.bank_account}"),
+                TextBlock(regular_font, f" {house.bank_owner}")
+            )
+            bank_cell.value = rich_text
             bank_cell.alignment = Alignment(horizontal='left', vertical='center')
             ws.row_dimensions[bank_row_idx].height = 20
 
             note_row_idx = total_row_idx + 3
             ws.merge_cells(start_row=note_row_idx, start_column=1, end_row=note_row_idx, end_column=10)
             note_cell = ws.cell(row=note_row_idx, column=1)
-            transfer_code = f"{house.bank_transfer_prefix} {room.room_code}"
-            note_cell.value = f"Lưu ý : CHỈ CẦN GHI NỘI DUNG {transfer_code}"
+            note_cell.value = "Lưu Ý : ko cần ghi nội dung"
             note_cell.font = Font(name='Times New Roman', size=11, bold=True)
             note_cell.alignment = Alignment(horizontal='left', vertical='center')
             ws.row_dimensions[note_row_idx].height = 20
