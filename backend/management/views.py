@@ -246,7 +246,12 @@ class PaymentViewSet(viewsets.ModelViewSet):
         # 1. Create workbook and select active sheet
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = f"Phiếu thu phòng {room.room_code}"
+        
+        # Clean title for Excel sheet (remove invalid characters and restrict to 31 chars)
+        sheet_title = f"Phong {room.room_code}"
+        for c in ['\\', '/', '?', '*', ':', '[', ']']:
+            sheet_title = sheet_title.replace(c, '-')
+        ws.title = sheet_title[:31]
         
         # Show gridlines
         ws.sheet_view.showGridLines = True
@@ -492,8 +497,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
         for payment in payments_qs:
             room = payment.room
 
-            # Sheet name: max 31 chars (Excel limit)
+            # Sheet name: max 31 chars (Excel limit) and no invalid characters
             sheet_name = f"{room.room_code} - {payment.month}"
+            for c in ['\\', '/', '?', '*', ':', '[', ']']:
+                sheet_name = sheet_name.replace(c, '-')
             if len(sheet_name) > 31:
                 sheet_name = sheet_name[:31]
 
