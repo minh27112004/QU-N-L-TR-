@@ -35,12 +35,12 @@ class RoomViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows rooms to be viewed or edited.
     """
-    queryset = Room.objects.all()
+    queryset = Room.objects.select_related('house')
     serializer_class = RoomSerializer
     pagination_class = OptionalPageNumberPagination
 
     def get_queryset(self):
-        queryset = Room.objects.all()
+        queryset = Room.objects.select_related('house')
         # Search by code or name
         search = self.request.query_params.get('search', None)
         if search:
@@ -122,12 +122,12 @@ class ContractViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Contracts.
     """
-    queryset = Contract.objects.all()
+    queryset = Contract.objects.select_related('room', 'room__house', 'tenant')
     serializer_class = ContractSerializer
     pagination_class = OptionalPageNumberPagination
 
     def get_queryset(self):
-        queryset = Contract.objects.all()
+        queryset = Contract.objects.select_related('room', 'room__house', 'tenant')
         is_active_filter = self.request.query_params.get('is_active', None)
         if is_active_filter is not None:
             is_active_bool = is_active_filter.lower() in ('true', '1', 't')
@@ -179,12 +179,12 @@ class PaymentViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Payments.
     """
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.select_related('room', 'room__house')
     serializer_class = PaymentSerializer
     pagination_class = OptionalPageNumberPagination
 
     def get_queryset(self):
-        queryset = Payment.objects.all()
+        queryset = Payment.objects.select_related('room', 'room__house')
         
         # Filter by month (YYYY-MM)
         month = self.request.query_params.get('month', None)
