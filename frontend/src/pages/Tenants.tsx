@@ -36,7 +36,7 @@ const Tenants: React.FC = () => {
       const response = await tenantService.getAll(searchTerm, currentPage);
       setTenants(response.data.results);
       setTotalCount(response.data.count);
-      setTotalPages(Math.ceil(response.data.count / 10));
+      setTotalPages(Math.ceil(response.data.count / 6));
       setError(null);
     } catch (err) {
       console.error('Error fetching tenants:', err);
@@ -264,8 +264,8 @@ const Tenants: React.FC = () => {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/85">
               <p className="text-xs text-slate-400">
-                Hiển thị <span className="font-bold text-white">{Math.min((currentPage - 1) * 10 + 1, totalCount)}</span> đến{' '}
-                <span className="font-bold text-white">{Math.min(currentPage * 10, totalCount)}</span> trong tổng số{' '}
+                Hiển thị <span className="font-bold text-white">{Math.min((currentPage - 1) * 6 + 1, totalCount)}</span> đến{' '}
+                <span className="font-bold text-white">{Math.min(currentPage * 6, totalCount)}</span> trong tổng số{' '}
                 <span className="font-bold text-white">{totalCount}</span> khách thuê
               </p>
               <div className="flex items-center gap-1">

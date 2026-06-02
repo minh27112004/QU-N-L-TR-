@@ -59,7 +59,7 @@ const Finance: React.FC = () => {
       );
       setExpenses(expensesRes.data.results);
       setTotalCount(expensesRes.data.count);
-      setTotalPages(Math.ceil(expensesRes.data.count / 10));
+      setTotalPages(Math.ceil(expensesRes.data.count / 6));
 
       // 3. Fetch stats for charts and cards
       const statsRes = await dashboardService.getStats();
@@ -404,8 +404,8 @@ const Finance: React.FC = () => {
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/85">
               <p className="text-xs text-slate-400">
-                Hiển thị <span className="font-bold text-white">{Math.min((currentPage - 1) * 10 + 1, totalCount)}</span> đến{' '}
-                <span className="font-bold text-white">{Math.min(currentPage * 10, totalCount)}</span> trong tổng số{' '}
+                Hiển thị <span className="font-bold text-white">{Math.min((currentPage - 1) * 6 + 1, totalCount)}</span> đến{' '}
+                <span className="font-bold text-white">{Math.min(currentPage * 6, totalCount)}</span> trong tổng số{' '}
                 <span className="font-bold text-white">{totalCount}</span> khoản chi
               </p>
               <div className="flex items-center gap-1">
