@@ -401,7 +401,7 @@ const Finance: React.FC = () => {
         )}
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {totalCount > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/85">
               <p className="text-xs text-slate-400">
                 Hiển thị <span className="font-bold text-white">{Math.min((currentPage - 1) * 6 + 1, totalCount)}</span> đến{' '}
