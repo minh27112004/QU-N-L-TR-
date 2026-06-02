@@ -24,7 +24,7 @@ services:
     environment:
       - DEBUG=False
       - SECRET_KEY=django-docker-secret-key-123456789
-      - DATABASE_URL=postgresql://postgres:password123@db:5432/nhatro
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:password123@db:5432/nhatro}
       - ALLOWED_HOSTS=*
     depends_on:
       db:
